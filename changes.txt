@@ -41,3 +41,32 @@
 ### Fixes during build
 - Fixed WebAppActivity missing goBackOrExit definition (Kotlin compile error on first tag);
   moved v1.0.0 tag to the fixed commit and rebuilt successfully
+
+## 2026-08-27 - v1.1.0 (Update)
+
+### Fix: LiveChat box went to signup page instead of loading the chat
+- Enabled first-party AND third-party cookies via CookieManager
+  (LiveChat relies on cookies/session; without them it bounces to signup)
+- Enabled multiple windows + JavaScript window.open handling: onCreateWindow now
+  routes LiveChat popup windows back into the main WebView so chat loads in-app
+
+### Fix: menu/dialog text disappearing (should be dark bg + light text)
+- Added explicit dark dialog theme overlay ThemeOverlay.IndustryRadio.Dialog
+  (dark surface background, light text, visible list items, dark force off)
+- Applied the overlay to the exit menus and the WebView JS alert dialog
+- New IndustryRadioApp Application class applies dark theme BEFORE any activity
+  is created, eliminating mid-launch theme-recreation text/color glitches
+- SettingsManager.init is now idempotent (runs once in Application.onCreate)
+
+### Change: launcher / app logo now shows the letters IR
+- Replaced vector circle-only icon with a full blue-circle + white "IR" logo
+- Adaptive foreground (drawable/ic_launcher_foreground.png) + legacy mipmaps
+  (mdpi..xxxhdpi, ic_launcher + ic_launcher_round)
+
+### Release
+- versionCode 2 / versionName 1.1.0; tag v1.1.0
+- Backup of known-working v1.0.0 APK stored at Backup/IndustryRadio-v1.0.0.apk
+- APK saved locally to apk/IndustryRadio.apk
+- Same keystore/certificate (SHA-256 starts eb4e743e...) so it updates v1.0.0
+  in place without uninstall
+- Release page: https://github.com/jnetai-clawbot/industryradio-app/releases
