@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.webkit.CookieManager
 import android.webkit.JsResult
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
@@ -74,7 +75,20 @@ class WebAppActivity : AppCompatActivity() {
         settings.loadWithOverviewMode = true
         settings.useWideViewPort = true
         settings.cacheMode = WebSettings.LOAD_DEFAULT
+        settings.javaScriptCanOpenWindowsAutomatically = true
+        settings.setSupportMultipleWindows(true)
         settings.userAgentString = settings.userAgentString.replace("; wv", "")
+
+        try {
+            // LiveChat (and many widgets) rely on cookies, including
+            // third-party cookies. Without these, chat sessions cannot be
+            // established and the widget bounces the user to a signup page.
+            CookieManager.getInstance().setAcceptCookie(true)
+            CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
+            DebugLogger.i("Cookies enabled (first + third party) for web view")
+        } catch (e: Exception) {
+            DebugLogger.e("${ErrorCodes.WEBVIEW_INIT} Cookie setup failed: ${e.message}", e)
+        }
 
         webView.webChromeClient = object : WebChromeClient() {
             override fun onPermissionRequest(request: PermissionRequest) {
@@ -101,13 +115,51 @@ class WebAppActivity : AppCompatActivity() {
                 }
             }
 
+            override fun onCreateWindow(
+                view: WebView?,
+                isDialog: Boolean,
+                isUserGesture: Boolean,
+                resultMsg: android.os.Message?
+            ): Boolean {
+                // LiveChat opens its chat window via window.open(). Route the
+                // popup back into the main WebView so it loads in-app instead
+                // of failing silently or bouncing to an external signup page.
+                return try {
+                    val newWebView = WebView(this@WebAppActivity)
+                    newWebView.settings.javaScriptEnabled = true
+                    newWebView.settings.domStorageEnabled = true
+                    (resultMsg?.obj as? WebView.WebViewTransport)?.webView = newWebView
+                    resultMsg?.sendToTarget()
+                    newWebView.webViewClient = object : WebViewClient() {
+                        override fun shouldOverrideUrlLoading(
+                            v: WebView?,
+                            request: WebResourceRequest
+                        ): Boolean {
+                            webView.loadUrl(request.url.toString())
+                            return true
+                        }
+
+                        @Deprecated("Deprecated in Java")
+                        override fun shouldOverrideUrlLoading(v: WebView?, url: String?): Boolean {
+                            if (url != null) webView.loadUrl(url)
+                            return true
+                        }
+                    }
+                    DebugLogger.d("onCreateWindow routed popup to main WebView")
+                    true
+                } catch (e: Exception) {
+                    DebugLogger.w("${ErrorCodes.WEBVIEW_LOAD} onCreateWindow failed: ${e.message}")
+                    false
+                }
+            }
+
             override fun onJsAlert(
                 view: WebView?,
                 url: String?,
                 message: String?,
                 result: JsResult
             ): Boolean {
-                MaterialAlertDialogBuilder(this@WebAppActivity)
+                MaterialAlertDialogBuilder(this@WebAppActivity, R.style.ThemeOverlay_IndustryRadio_Dialog)
                     .setTitle(getString(R.string.app_name))
                     .setMessage(message)
                     .setPositiveButton("OK") { _, _ -> result.confirm() }
@@ -215,7 +267,7 @@ class WebAppActivity : AppCompatActivity() {
                 getString(R.string.goto_about),
                 getString(R.string.exit_app)
             )
-            MaterialAlertDialogBuilder(this)
+            MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_IndustryRadio_Dialog)
                 .setTitle(R.string.app_name)
                 .setItems(options) { dialog, which ->
                     when (which) {

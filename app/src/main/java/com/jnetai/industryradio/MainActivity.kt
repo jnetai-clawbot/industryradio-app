@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                 getString(R.string.goto_about),
                 getString(R.string.exit_app)
             )
-            MaterialAlertDialogBuilder(this)
+            MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_IndustryRadio_Dialog)
                 .setTitle(R.string.app_name)
                 .setItems(options) { dialog, which ->
                     when (which) {

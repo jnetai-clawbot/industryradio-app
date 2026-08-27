@@ -16,10 +16,13 @@ object SettingsManager {
     const val DEFAULT_SITE_URL = "https://industryradio.co.uk"
 
     private lateinit var prefs: SharedPreferences
+    private var initialized = false
 
     fun init(context: Context) {
+        if (initialized) return
         try {
             prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            initialized = true
             applyTheme()
             DebugLogger.i("SettingsManager initialized")
         } catch (e: Exception) {

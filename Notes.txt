@@ -1,0 +1,22 @@
+Industry Radio v1.0.0 built and released.
+
+- APK: /home/jay/Documents/Scripts/AI/OpenCode/IndustryRadio-App/apk/IndustryRadio.apk (signed v2, dedicated keystore — future updates install without uninstall)
+
+- Release page: https://github.com/jnetai-clawbot/industryradio-app/releases
+
+- Features: auto-opens industryradio.co.uk in a responsive WebView; back button menu (Goto Settings / About / Exit App / Back To App); Settings edits the site URL; About shows full version, "Made by jnetai.com", Check for Updates (falls back to the releases link on any failure) and Share App; dark themed with bottom spacing; persistent error codes + DebugLogger throughout.
+- Built via GitHub Actions; changes logged in changes.txt.
+
+
+
+Industry Radio
+
+https://industryradio.co.uk
+
+
+
+
+
+
+
+
