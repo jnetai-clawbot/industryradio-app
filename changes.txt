@@ -1,0 +1,43 @@
+# Industry Radio App - Changes Log
+
+## 2026-08-27 - v1.0.0 (Initial Release)
+
+### Project setup
+- Created new project at /home/jay/Documents/Scripts/AI/OpenCode/IndustryRadio-App/
+- New GitHub repository: https://github.com/jnetai-clawbot/industryradio-app
+- Dedicated keystore generated at app/keystore/keystore.jks (alias: industryradio, CN=Industry Radio)
+- Keystore stored as base64 in GitHub Actions secrets: KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
+- Same keystore will be reused for all future updates so the app can update without uninstall
+- Build is via GitHub Actions only (prime directive) - NEVER local builds
+
+### App features (dark themed, centered, spaced bottom)
+- MainActivity: auto-opens the radio site on launch; "Open Radio", Settings and About buttons
+- Back button menu option dialog: Goto Settings, About, Exit App, Back To App (Cancel)
+- WebView wrapper loads https://industryradio.co.uk (responsive; fullscreen mobile view)
+- Back button in webview: navigates WebView history, then offers the options menu
+- SettingsActivity: allows updating the site URL, with validation and Reset to default
+- AboutActivity: full version number (matches GitHub release tag v1.0.0), "Made by jnetai.com"
+- "Check for Updates" button queries GitHub latest release via API; on any failure it falls
+  over to opening the GitHub releases page link
+- "Share App" button shares the GitHub releases link
+- Internet permission included for site + update checks
+- Bottom padding/spacing added so buttons/elements at the bottom are never cut off
+
+### Error handling / debugging (persistent)
+- DebugLogger.kt: timestamped, tagged, in-memory ring-buffer log (500 entries) with full
+  stack traces on failures
+- ErrorCodes.kt: central permanent error codes used everywhere (Settings, WebView, Update,
+  Share, Main, ExitMenu, Nav)
+- Every activity wraps UI setup in try/catch, logs with error codes, shows user feedback
+- WebView errors log error codes and show a readable error message
+
+### Release
+- Tag v1.0.0 pushed; GitHub Actions built signed release APK
+- Release name: v1.0.0
+- APK: IndustryRadio.apk (signed v2, SHA-256 EB:4E:74:3E:E8:DF:B3:E0:F3:B6:79:CE:CC:8B:E4:CF:F2:7E:F5:6F:74:42:FE:DB:19:0C:32:3B:2B:B3:5E:76 - matches keystore)
+- APK saved locally to apk/IndustryRadio.apk
+- Release page: https://github.com/jnetai-clawbot/industryradio-app/releases
+
+### Fixes during build
+- Fixed WebAppActivity missing goBackOrExit definition (Kotlin compile error on first tag);
+  moved v1.0.0 tag to the fixed commit and rebuilt successfully
