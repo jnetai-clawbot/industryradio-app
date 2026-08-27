@@ -244,6 +244,10 @@ class WebAppActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        goBackOrExit()
+    }
+
+    private fun goBackOrExit() {
         if (webView.canGoBack()) {
             webView.goBack()
             DebugLogger.d("WebView back to history")
